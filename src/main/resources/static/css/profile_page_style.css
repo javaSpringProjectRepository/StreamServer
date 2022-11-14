@@ -1,0 +1,11 @@
+body {
+    background-image: linear-gradient(to bottom, lightsalmon, deeppink);
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-attachment: fixed;
+}
+
+.col-md-4 img{
+    width: 200px;
+    height: 200px;
+}

@@ -1,0 +1,32 @@
+body {
+    background-image: linear-gradient(to bottom, lightsalmon, deeppink);
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-attachment: fixed;
+}
+
+.navbar-expand-lg {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.navbar-expand-lg button {
+    color: white;
+}
+
+.navbar-expand-lg button:hover {
+    color: white;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
+}
+
+.list-group-item {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.list-group-item :hover{
+    color: black;
+}

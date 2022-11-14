@@ -1,0 +1,6 @@
+body {
+    background-image: linear-gradient(to bottom, lightsalmon, deeppink);
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-attachment: fixed;
+}

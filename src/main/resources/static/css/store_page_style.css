@@ -1,0 +1,58 @@
+body {
+    background-image: linear-gradient(to bottom, lightsalmon, deeppink);
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-attachment: fixed;
+}
+
+.navbar-expand-lg {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.navbar-expand-lg button {
+    color: white;
+}
+
+.navbar-expand-lg button:hover {
+    color: white;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
+}
+
+.carousel {
+    width: 750px;
+    height: 400px;
+}
+
+.carousel-inner img {
+    width: 100%;
+    height: 400px;
+}
+
+.thumbnail {
+    padding: 5px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    color: white;
+}
+
+.thumbnail a {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.thumbnail a:hover {
+    color: cyan;
+innershadow(gaussian, cyan, 10, 0.6, 0, 0);
+}
+
+.thumbnail img {
+    border-radius: 10px;
+    width: 300px;
+    height: 200px;
+}

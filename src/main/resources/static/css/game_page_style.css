@@ -1,0 +1,51 @@
+body {
+    background-image: linear-gradient(to bottom, lightsalmon, deeppink);
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-attachment: fixed;
+}
+
+.thumbnail {
+    padding: 5px;
+    border-radius: 10px;
+    text-align: left;
+    color: white;
+}
+
+.thumbnail a {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.thumbnail a:hover {
+    color: cyan;
+innershadow(gaussian, cyan, 10, 0.6, 0, 0);
+}
+
+.thumbnail img {
+    border-radius: 10px;
+    width: 900px;
+    height: 500px;
+}
+
+.navbar-expand-lg {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.navbar-expand-lg button {
+    color: white;
+}
+.navbar-expand-lg button:hover {
+    color: white;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
+}
+.navbar-expand-lg .form-inline .btn{
+    background-color: lawngreen;
+    font-family: Ebrima, serif;
+}
