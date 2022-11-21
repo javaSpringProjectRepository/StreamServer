@@ -1,7 +1,6 @@
 package org.spring.project.application.server.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.spring.project.application.server.model.Game;
 import org.spring.project.application.server.model.User;
 import org.spring.project.application.server.properties.FolderProperties;
@@ -10,11 +9,13 @@ import org.spring.project.application.server.properties.ResourceProperties;
 import org.spring.project.application.server.repository.GameRepository;
 import org.spring.project.application.server.repository.UserRepository;
 import org.spring.project.application.server.service.GameService;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
-@Slf4j
 @RequestMapping("/store")
 @RequiredArgsConstructor
 public class StoreController {
@@ -38,12 +38,11 @@ public class StoreController {
 
     @GetMapping()
     public String storePage(Model model) {
-        List<Game> games = gameRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(Game::getTitle))
-                .collect(Collectors.toList());
+        List<Game> games = gameRepository.findAll().stream()
+                .sorted(Comparator.comparing(Game::getTitle)).collect(Collectors.toList());
         model.addAttribute(keyProperties.getStyleFolder(),
                 folderProperties.getStyleFolder() + resourceProperties.getStorePageStyle());
+        model.addAttribute(keyProperties.getResourcesFolder(), folderProperties.getResourcesHtmlFolder());
         model.addAttribute(keyProperties.getGames(), games);
         return "store_page";
     }

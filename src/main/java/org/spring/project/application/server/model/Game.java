@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Set;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -29,12 +30,12 @@ public class Game {
     private String fullText;
     @NonNull
     private BigDecimal price;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = EAGER)
     @JoinTable(name = "games_categories",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private GameCategory gameCategory;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = EAGER)
     @JoinTable(name = "game_update",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "update_id"))

@@ -31,6 +31,7 @@ public class TokenService {
     private final JwtConfig jwtConfig;
     private final UserRepository userRepository;
     private final KeyProperties keyProperties;
+    private final UtilService utilService;
 
     public void createTokens(HttpServletResponse response, String username, List<String> authorities) {
         Algorithm algorithm = Algorithm.HMAC256(jwtConfig.getSecretKey());
@@ -71,42 +72,49 @@ public class TokenService {
                                     user.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
                             log.info("Пользователь {} обновил токен", user.getUsername());
                             return new ResponseEntity<>(new HttpHeaders() {{
-                                add(keyProperties.getServerMessage(), "Токен обновлен");
+                                add(keyProperties.getServerMessage(),
+                                        utilService.sendServerErrorMessage("Токен обновлен"));
                             }}, OK);
                         } else {
                             log.error("Токен устарел");
                             return new ResponseEntity<>(new HttpHeaders() {{
-                                add(keyProperties.getServerMessage(), "Токен устарел");
+                                add(keyProperties.getServerMessage(),
+                                        utilService.sendServerErrorMessage("Токен устарел"));
                             }}, FORBIDDEN);
                         }
                     } catch (NullPointerException e) {
                         log.error("Токен обновления не назначен в базе");
                         return new ResponseEntity<>(new HttpHeaders() {{
-                            add(keyProperties.getServerMessage(), "Токен обновления пользователя не назначен");
+                            add(keyProperties.getServerMessage(),
+                                    utilService.sendServerErrorMessage("Токен обновления пользователя не назначен"));
                         }}, FORBIDDEN);
                     }
                 } else {
                     log.error("Пользователь {} не найден в базе", decodedJWT.getSubject());
                     return new ResponseEntity<>(new HttpHeaders() {{
-                        add(keyProperties.getServerMessage(), "Пользователь " + decodedJWT.getSubject() +
-                                " не найден");
+                        add(keyProperties.getServerMessage(),
+                                utilService.sendServerErrorMessage("Пользователь " + decodedJWT.getSubject() +
+                                " не найден"));
                     }}, NOT_FOUND);
                 }
             } catch (SignatureVerificationException e) {
                 log.error("Ошибка при расшифровке токена");
                 return new ResponseEntity<>(new HttpHeaders() {{
-                    add(keyProperties.getServerMessage(), "Ошибка при расшифровке токена");
+                    add(keyProperties.getServerMessage(),
+                            utilService.sendServerErrorMessage("Ошибка при расшифровке токена"));
                 }}, FORBIDDEN);
             } catch (Exception e) {
                 log.error("Ошибка при обновлении токена");
                 return new ResponseEntity<>(new HttpHeaders() {{
-                    add(keyProperties.getServerMessage(), "Ошибка при обновлении токена");
+                    add(keyProperties.getServerMessage(),
+                            utilService.sendServerErrorMessage("Ошибка при обновлении токена"));
                 }}, FORBIDDEN);
             }
         } else {
             log.error("Токен не найден в заголовках запроса");
             return new ResponseEntity<>(new HttpHeaders() {{
-                add(keyProperties.getServerMessage(), "Токен не найден в заголовках запроса");
+                add(keyProperties.getServerMessage(),
+                        utilService.sendServerErrorMessage("Токен не найден в заголовках запроса"));
             }}, FORBIDDEN);
         }
     }

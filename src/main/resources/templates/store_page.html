@@ -20,7 +20,6 @@
         crossorigin="anonymous"></script>
 <div class="container mt-2">
     <nav class="navbar navbar-expand-lg">
-        <div class="collapse navbar-collapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item dropdown">
                     <button class="btn">Ваш магазин</button>
@@ -41,7 +40,6 @@
                 <input class="form-control mr-sm-2" type="search">
                 <button class="btn" type="submit">Поиск</button>
             </form>
-        </div>
     </nav>
 </div>
 <div class="d-flex justify-content-center mt-3 mb-2">
@@ -55,21 +53,21 @@
             <div class="carousel-item active">
                 <a th:href="'/store/games/' + ${games.get(0).getName()}">
                     <img class="d-block"
-                         th:src="@{'file://I:/Idea/server folder/resources/' + ${games.get(0).getName()} + '/store_image/store_image.jpg'}"
+                         th:src="@{${resourcesFolder + games.get(0).getName()} + '/store_image/store_image.jpg'}"
                          alt="Первый слайд">
                 </a>
             </div>
             <div class="carousel-item">
                 <a th:href="'/store/games/' + ${games.get(1).getName()}">
                     <img class="d-block"
-                         th:src="@{'file://I:/Idea/server folder/resources/' + ${games.get(1).getName()} + '/store_image/store_image.jpg'}"
+                         th:src="@{${resourcesFolder + games.get(1).getName()} + '/store_image/store_image.jpg'}"
                          alt="Второй слайд">
                 </a>
             </div>
             <div class="carousel-item">
                 <a th:href="'/store/games/' + ${games.get(2).getName()}">
                     <img class="d-block"
-                         th:src="@{'file://I:/Idea/server folder/resources/' + ${games.get(2).getName()} + '/store_image/store_image.jpg'}"
+                         th:src="@{${resourcesFolder + games.get(2).getName()} + '/store_image/store_image.jpg'}"
                          alt="Третий слайд">
                 </a>
             </div>
@@ -85,7 +83,7 @@
 <div class="d-flex justify-content-center flex-wrap">
     <div class="thumbnail mt-2 ml-2 mr-2" th:each="game:${games}">
         <a th:href="'/store/games/' + ${game.getName()}">
-            <img th:src="@{'file://I:/Idea/server folder/resources/' + ${game.getName()} + '/store_image/store_image.jpg'}" alt="D'oh">
+            <img th:src="@{${resourcesFolder + game.getName()} + '/store_image/store_image.jpg'}" alt="D'oh">
             <h3 th:text="${game.getTitle()}"></h3>
         </a>
     </div>

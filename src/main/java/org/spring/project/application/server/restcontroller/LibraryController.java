@@ -1,19 +1,16 @@
 package org.spring.project.application.server.restcontroller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.spring.project.application.server.dto.GameFileDto;
 import org.spring.project.application.server.model.GameUpdateNews;
 import org.spring.project.application.server.service.GameService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@Slf4j
 @RequestMapping("/games")
 @RequiredArgsConstructor
 public class LibraryController {

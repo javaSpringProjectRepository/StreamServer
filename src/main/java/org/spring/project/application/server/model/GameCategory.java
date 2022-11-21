@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 import java.util.Set;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -23,6 +24,6 @@ public class GameCategory {
     private String name;
     @NonNull
     private String title;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gameCategory")
+    @OneToMany(fetch = EAGER, mappedBy = "gameCategory")
     private Set<Game> games;
 }

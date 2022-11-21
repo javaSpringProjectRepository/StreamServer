@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
 @Getter
+@Component
 public class KeyProperties {
 
     @Value("${key.header.gameSize}")
@@ -14,6 +14,8 @@ public class KeyProperties {
     private String serverMessage;
     @Value("${key.html.styleFolder}")
     private String styleFolder;
+    @Value("${key.html.resourcesFolder}")
+    private String resourcesFolder;
     @Value("${key.html.user}")
     private String user;
     @Value("${key.html.status}")

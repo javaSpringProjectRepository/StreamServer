@@ -4,12 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.spring.project.application.server.dto.RegistrationDto;
 import org.spring.project.application.server.model.User;
-import org.spring.project.application.server.properties.KeyProperties;
 import org.spring.project.application.server.repository.RoleRepository;
 import org.spring.project.application.server.repository.StatusRepository;
 import org.spring.project.application.server.repository.UserRepository;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,9 +18,9 @@ import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @Service
 @Slf4j
@@ -34,7 +31,6 @@ public class UserService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final KeyProperties keyProperties;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -65,9 +61,7 @@ public class UserService implements UserDetailsService {
         List<String> errorList = new ArrayList<>();
         if (bindingResult.hasErrors()) {
             log.error("Ошибка валидации пользователя {}", registrationDto.getUsername());
-            bindingResult.getAllErrors().forEach(error -> {
-                errorList.add(error.getDefaultMessage());
-            });
+            bindingResult.getAllErrors().forEach(error -> errorList.add(error.getDefaultMessage()));
         }
         Optional<User> checkUsernameExist = userRepository.findByUsername(registrationDto.getUsername());
         if (checkUsernameExist.isPresent()) {
@@ -83,9 +77,6 @@ public class UserService implements UserDetailsService {
                 registrationDto.getEmail(),
                 new BigDecimal(0));
         saveInDatabase(user);
-        log.info("Пользователь {} создан", registrationDto.getUsername());
-        return new ResponseEntity<>(new HttpHeaders(){{
-            add(keyProperties.getServerMessage(), "Пользователь создан");
-        }}, CREATED);
+        return new ResponseEntity<>(CREATED);
     }
 }

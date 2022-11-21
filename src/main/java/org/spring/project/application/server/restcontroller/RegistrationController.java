@@ -20,7 +20,8 @@ public class RegistrationController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> registration(@RequestBody @Valid RegistrationDto registrationDto, BindingResult bindingResult){
+    public ResponseEntity<?> registration(@RequestBody @Valid RegistrationDto registrationDto,
+                                          BindingResult bindingResult){
         return userService.saveUser(registrationDto, bindingResult);
     }
 }

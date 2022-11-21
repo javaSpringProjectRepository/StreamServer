@@ -18,22 +18,22 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @PostMapping("/createrole")
+    @PostMapping("/create_role")
     public ResponseEntity<?> createRole(@RequestBody Role role) {
         return adminService.saveRole(role);
     }
 
-    @PostMapping("/createstate")
+    @PostMapping("/create_state")
     public ResponseEntity<?> createStatus(@RequestBody State state) {
         return adminService.saveState(state);
     }
 
-    @PostMapping("/roletouser")
+    @PostMapping("/role_to_user")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) {
         return adminService.addRoleToUser(form.getUsername(), form.getRoleName());
     }
 
-    @PostMapping("/statetouser")
+    @PostMapping("/state_to_user")
     public ResponseEntity<?> addStatusToUser(@RequestBody StatusToUserForm form) {
         return adminService.addStateToUser(form.getUsername(), form.getStatusName());
     }

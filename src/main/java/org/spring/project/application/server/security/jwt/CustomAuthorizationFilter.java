@@ -4,13 +4,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.impl.JWTParser;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.spring.project.application.server.properties.KeyProperties;
+import org.spring.project.application.server.service.UtilService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,19 +20,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RequiredArgsConstructor
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtConfig jwtConfig;
+    private final UtilService utilService;
     private final KeyProperties keyProperties;
 
     @Override
@@ -61,13 +61,16 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 log.error("Время действия токена пользователя {} истекло",
                         JWT.decode(authorizationToken.substring(jwtConfig.getAccessTokenPrefix().length()))
                                 .getSubject());
-                response.setHeader(keyProperties.getServerMessage(), "Время действия токена истекло");
-                response.setHeader("server_time", LocalDateTime.now().toString());
                 response.setStatus(NOT_ACCEPTABLE.value());
+                response.setHeader(keyProperties.getServerMessage(),
+                        utilService.sendServerErrorMessage("Время действия токена истекло"));
+
+
             } catch (Exception e) {
                 log.error("Ошибка в 'CustomAuthorizationFilter'");
-                response.setHeader(keyProperties.getServerMessage(), "Ошибка при авторизации");
                 response.setStatus(FORBIDDEN.value());
+                response.setHeader(keyProperties.getServerMessage(),
+                        utilService.sendServerErrorMessage("Ошибка при авторизации"));
             }
         } else {
             filterChain.doFilter(request, response);

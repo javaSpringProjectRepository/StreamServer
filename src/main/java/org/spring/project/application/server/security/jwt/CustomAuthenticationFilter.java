@@ -3,8 +3,9 @@ package org.spring.project.application.server.security.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.spring.project.application.server.properties.KeyProperties;
 import org.spring.project.application.server.service.TokenService;
+import org.spring.project.application.server.service.UtilService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,16 +16,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
-@Slf4j
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 @RequiredArgsConstructor
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final UtilService utilService;
+    private final KeyProperties keyProperties;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
@@ -50,12 +53,17 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 authResult.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
     }
 
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException failed) {
+        response.setStatus(NOT_FOUND.value());
+        response.setHeader(keyProperties.getServerMessage(), utilService.sendServerErrorMessage("Пользователь не найден"));
+    }
 }
 
 @Data
 class AuthenticationDto {
-
     private String username;
     private String password;
-
 }

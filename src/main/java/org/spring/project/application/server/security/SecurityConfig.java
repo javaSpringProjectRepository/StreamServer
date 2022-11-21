@@ -6,6 +6,7 @@ import org.spring.project.application.server.security.jwt.CustomAuthenticationFi
 import org.spring.project.application.server.security.jwt.CustomAuthorizationFilter;
 import org.spring.project.application.server.security.jwt.JwtConfig;
 import org.spring.project.application.server.service.TokenService;
+import org.spring.project.application.server.service.UtilService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
     private final JwtConfig jwtConfig;
     private final TokenService tokenService;
+    private final UtilService utilService;
     private final KeyProperties keyProperties;
 
     @Override
@@ -43,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         CustomAuthenticationFilter customAuthenticationFilter =
-                new CustomAuthenticationFilter(authenticationManagerBean(), tokenService);
+                new CustomAuthenticationFilter(authenticationManagerBean(), tokenService, utilService, keyProperties);
         customAuthenticationFilter.setFilterProcessesUrl("/authentication");
 
         http
@@ -54,7 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilter(customAuthenticationFilter)
                 .addFilterBefore(
-                        new CustomAuthorizationFilter(jwtConfig, keyProperties), UsernamePasswordAuthenticationFilter.class);
+                        new CustomAuthorizationFilter(jwtConfig, utilService, keyProperties),
+                        UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

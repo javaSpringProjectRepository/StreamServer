@@ -15,8 +15,9 @@ import org.spring.project.application.server.properties.KeyProperties;
 import org.spring.project.application.server.properties.ResourceProperties;
 import org.spring.project.application.server.repository.GameRepository;
 import org.spring.project.application.server.repository.UserRepository;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
@@ -42,6 +45,7 @@ public class GameService {
     private final FolderProperties folderProperties;
     private final ResourceProperties resourceProperties;
     private final KeyProperties keyProperties;
+    private final UtilService utilService;
 
     //    Метод для использования сервером (без ResponseEntity)
     public void saveGameToUser(String username, String gameName) {
@@ -67,42 +71,46 @@ public class GameService {
         log.info("Пользователю {} добавлена игра {}", user.getUsername(), game.getName());
     }
 
-    public HttpStatus buyGame(String gameName, Authentication authentication, HttpServletResponse response) {
+    public int buyGame(String gameName, Authentication authentication, HttpServletResponse response) {
         User user = userRepository.findByUsername(authentication.getName()).orElse(null);
         Game game = gameRepository.findByName(gameName).orElse(null);
         if (user == null) {
             log.error("Пользователь {} не найден в базе", authentication.getName());
-            response.setHeader(keyProperties.getServerMessage(), "Пользователь " + authentication.getName() +
-                    " не найден в базе");
             response.setStatus(NOT_FOUND.value());
-            return NOT_FOUND;
+            response.setHeader(keyProperties.getServerMessage(),
+                    utilService.sendServerErrorMessage("Пользователь " + authentication.getName() + " не найден в базе"));
+            return NOT_FOUND.value();
         }
         if (game == null) {
             log.error("Игра {} не найдена в базе", gameName);
-            response.setHeader(keyProperties.getServerMessage(), "Игра " + gameName + " не найдена в базе");
             response.setStatus(NOT_FOUND.value());
-            return NOT_FOUND;
+            response.setHeader(keyProperties.getServerMessage(),
+                    utilService.sendServerErrorMessage("Игра " + gameName + " не найдена в базе"));
+            return NOT_FOUND.value();
         }
         if (user.getGames().stream().anyMatch(userGame -> userGame.getName().equals(game.getName()))) {
             log.error("У пользователя {} уже есть игра {}", user.getUsername(), game.getTitle());
-            response.setHeader(keyProperties.getServerMessage(), "У пользователя " + user.getUsername() +
-                    " уже есть игра " + game.getTitle());
             response.setStatus(FORBIDDEN.value());
-            return FORBIDDEN;
+            response.setHeader(keyProperties.getServerMessage(),
+                    utilService.sendServerErrorMessage("У пользователя " + user.getUsername() +
+                    " уже есть игра "));
+            return FORBIDDEN.value();
         }
         if (user.getBudget().compareTo(game.getPrice()) < 0) {
             log.error("Недостаточно средств");
-            response.setHeader(keyProperties.getServerMessage(), "Недостаточно средств");
             response.setStatus(FORBIDDEN.value());
-            return FORBIDDEN;
+            response.setHeader(keyProperties.getServerMessage(),
+                    utilService.sendServerErrorMessage("Недостаточно средств"));
+            return FORBIDDEN.value();
         }
         user.setBudget(user.getBudget().subtract(game.getPrice()));
         user.getGames().add(game);
         userRepository.save(user);
         log.info("Игра {} добавлена в библиотеку игрока {}", game.getName(), user.getUsername());
-        response.setHeader(keyProperties.getServerMessage(), "Игра " + game.getName() + " добавлена в библиотеку");
         response.setStatus(OK.value());
-        return OK;
+        response.setHeader(keyProperties.getServerMessage(),
+                utilService.sendServerErrorMessage("Игра " + game.getName() + " добавлена в библиотеку"));
+        return OK.value();
     }
 
     public ResponseEntity<?> getUserLibrary(Authentication authentication) {
@@ -110,8 +118,8 @@ public class GameService {
         if (user == null) {
             log.error("Пользователь {} не найден в базе", authentication.getName());
             return new ResponseEntity<>(new HttpHeaders() {{
-                add(keyProperties.getServerMessage(), "Пользователь " + authentication.getName() +
-                        " не найден в базе");
+                add(keyProperties.getServerMessage(), utilService.sendServerErrorMessage(
+                        "Пользователь " + authentication.getName() + " не найден в базе"));
             }}, NOT_FOUND);
         }
         List<GameLibraryDto> games = user.getGames().stream().map(game -> {
@@ -140,24 +148,25 @@ public class GameService {
         Game game = gameRepository.findByName(gameName).orElse(null);
         if (user == null) {
             log.error("Пользователь {} не найден в базе", userName);
-            response.setHeader(keyProperties.getServerMessage(), "Пользователь " + userName +
-                    " не найден в базе");
             response.setStatus(NOT_FOUND.value());
+            response.setHeader(keyProperties.getServerMessage(),
+                    utilService.sendServerErrorMessage("Пользователь " + userName + " не найден в базе"));
             return Optional.empty();
         }
         if (game == null) {
             log.error("Игра {} не найдена в базе", gameName);
-            response.setHeader(keyProperties.getServerMessage(), "Игра " + gameName + " не найдена в базе");
             response.setStatus(NOT_FOUND.value());
+            response.setHeader(keyProperties.getServerMessage(),
+                    utilService.sendServerErrorMessage("Игра " + gameName + " не найдена в базе"));
             return Optional.empty();
         }
         if (user.getGames().stream().anyMatch(userGame -> userGame.getName().equals(game.getName()))) {
             return Optional.of(game);
         } else {
             log.error("Игра {} не найдена в библиотеке пользователя {}", game.getTitle(), user.getUsername());
-            response.setHeader(keyProperties.getServerMessage(), "Игра " + game.getTitle() +
-                    " не найдена в вашей библиотеке");
             response.setStatus(NOT_FOUND.value());
+            response.setHeader(keyProperties.getServerMessage(),
+                    utilService.sendServerErrorMessage("Игра " + game.getTitle() + " не найдена в вашей библиотеке"));
             return Optional.empty();
         }
     }
@@ -178,8 +187,9 @@ public class GameService {
             } catch (IOException e) {
                 log.error("Не удалось отправить картинку новостей игры {} пользователю {}",
                         game.getTitle(), authentication.getName());
-                response.setHeader(keyProperties.getServerMessage(), "Серверу не удалось отправить картинку новостей");
                 response.setStatus(FORBIDDEN.value());
+                response.setHeader(keyProperties.getServerMessage(),
+                        utilService.sendServerErrorMessage("Серверу не удалось отправить картинку новостей"));
             }
         }
     }
@@ -200,14 +210,15 @@ public class GameService {
             } catch (IOException e) {
                 log.error("Не удалось отправить картинку главной страницы библиотеки игры {} пользователю {}",
                         game.getTitle(), authentication.getName());
-                response.setHeader(keyProperties.getServerMessage(),
-                        "Серверу не удалось отправить картинку главной страницы библиотеки");
                 response.setStatus(FORBIDDEN.value());
+                response.setHeader(keyProperties.getServerMessage(), utilService.sendServerErrorMessage(
+                        "Серверу не удалось отправить картинку главной страницы библиотеки"));
             }
         }
     }
 
-    public ResponseEntity<?> getGameFilesList(String gameName, Authentication authentication, HttpServletResponse response) {
+    public ResponseEntity<?> getGameFilesList(String gameName, Authentication authentication,
+                                              HttpServletResponse response) {
         Game game = userGameCheck(gameName, authentication.getName(), response).orElse(null);
         if (game != null) {
             String gameDirectoryPath = folderProperties.getGamesFolder() + game.getName();
@@ -216,7 +227,8 @@ public class GameService {
                     gameDirectory, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 
             List<String> gameFilesInfo = new ArrayList<>();
-            gameFilesList.forEach(file -> gameFilesInfo.add(file.getAbsolutePath().substring(gameDirectoryPath.length())));
+            gameFilesList.forEach(file ->
+                    gameFilesInfo.add(file.getAbsolutePath().substring(gameDirectoryPath.length())));
             return new ResponseEntity<>(gameFilesInfo, new HttpHeaders() {{
                 add(keyProperties.getGameSize(), String.valueOf(FileUtils.sizeOfDirectory(gameDirectory)));
             }}, OK);
@@ -227,7 +239,8 @@ public class GameService {
         }
     }
 
-    public ResponseEntity<?> getGameUpdateNews(String gameName, Authentication authentication, HttpServletResponse response) {
+    public ResponseEntity<?> getGameUpdateNews(String gameName, Authentication authentication,
+                                               HttpServletResponse response) {
         Game game = userGameCheck(gameName, authentication.getName(), response).orElse(null);
         if (game != null) {
             return new ResponseEntity<>(game.getGameUpdateNews(), OK);
@@ -255,9 +268,9 @@ public class GameService {
             } catch (IOException e) {
                 log.error("Не удалось отправить картинку новостей обновлений игры {} пользователю {}",
                         game.getTitle(), authentication.getName());
-                response.setHeader(keyProperties.getServerMessage(),
-                        "Серверу не удалось отправить картинку новостей обновлений");
                 response.setStatus(FORBIDDEN.value());
+                response.setHeader(keyProperties.getServerMessage(),
+                        utilService.sendServerErrorMessage("Серверу не удалось отправить картинку новостей обновлений"));
             }
         }
     }
@@ -278,8 +291,9 @@ public class GameService {
                 response.flushBuffer();
             } catch (IOException e) {
                 log.error("Не удалось отправить лого игры {} пользователю {}", game.getTitle(), authentication.getName());
-                response.setHeader(keyProperties.getServerMessage(), "Серверу не удалось отправить лого игры");
                 response.setStatus(FORBIDDEN.value());
+                response.setHeader(keyProperties.getServerMessage(),
+                        utilService.sendServerErrorMessage("Серверу не удалось отправить логотип игры"));
             }
         }
     }
@@ -294,9 +308,9 @@ public class GameService {
                             game.getName() +
                             gameFileDto.getFilePath());
             if (file.length() == gameFileDto.getFileLength()) {
-                response.setHeader(keyProperties.getServerMessage(), "Файл " + gameFileDto.getFilePath() + " игры " +
-                        game.getTitle() + " уже загружен");
                 response.setStatus(FOUND.value());
+                response.setHeader(keyProperties.getServerMessage(), utilService.sendServerErrorMessage(
+                        "Файл " + gameFileDto.getFilePath() + " игры " + game.getTitle() + " уже загружен"));
             } else if (file.length() > gameFileDto.getFileLength()) {
                 try (FileInputStream in = new FileInputStream(file)) {
                     in.skip(gameFileDto.getFileLength());
@@ -305,9 +319,9 @@ public class GameService {
                 } catch (IOException e) {
                     log.error("Не удалось отправить файл {} игры {} пользователю {}",
                             gameFileDto.getFilePath(), game.getTitle(), authentication.getName());
-                    response.setHeader(keyProperties.getServerMessage(), "Не удалось отправить файл " +
-                            gameFileDto.getFilePath() + " игры " + game.getTitle());
                     response.setStatus(SERVICE_UNAVAILABLE.value());
+                    response.setHeader(keyProperties.getServerMessage(), utilService.sendServerErrorMessage(
+                            "Не удалось отправить файл " + gameFileDto.getFilePath() + " игры " + game.getTitle()));
                 }
             } else {
                 response.setStatus(FORBIDDEN.value());
@@ -316,7 +330,8 @@ public class GameService {
 
     }
 
-    public ResponseEntity<?> getActualGameSize(String gameName, Authentication authentication, HttpServletResponse response) {
+    public ResponseEntity<?> getActualGameSize(String gameName, Authentication authentication,
+                                               HttpServletResponse response) {
         Game game = userGameCheck(gameName, authentication.getName(), response).orElse(null);
         if (game != null) {
             File gameDirectory = new File(folderProperties.getGamesFolder() + game.getName());
