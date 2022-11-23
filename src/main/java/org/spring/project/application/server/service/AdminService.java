@@ -34,7 +34,7 @@ public class AdminService {
     }
 
     public ResponseEntity<?> saveRole(Role role) {
-        if (!role.getName().matches("[A-Z]*" + role.getName().length())) {
+        if (!role.getName().matches("[A-Z]{" + role.getName().length() + "}")) {
             log.error("Название роли введено неверно: {}", role.getName());
             return new ResponseEntity<>("Название роли должно содержать только заглавные буквы", NOT_ACCEPTABLE);
         }
@@ -49,7 +49,7 @@ public class AdminService {
     }
 
     public ResponseEntity<?> saveState(State state) {
-        if (!state.getName().matches("[A-Z]*" + state.getName().length())) {
+        if (!state.getName().matches("[A-Z]{" + state.getName().length() + "}")) {
             log.error("Название статуса введено неверно");
             return new ResponseEntity<>("Название статуса должно содержать только заглавные буквы",
                     NOT_ACCEPTABLE);
@@ -65,7 +65,7 @@ public class AdminService {
     }
 
     public ResponseEntity<?> saveGameCategory(GameCategory gameCategory) {
-        if (!gameCategory.getName().matches("[A-Z]*" + gameCategory.getName().length())) {
+        if (!gameCategory.getName().matches("[A-Z]{" + gameCategory.getName().length() + "}")) {
             log.error("Название категории введено неверно");
             return new ResponseEntity<>("Название категории должно содержать только заглавные буквы",
                     NOT_ACCEPTABLE);
