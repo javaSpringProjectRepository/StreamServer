@@ -64,6 +64,7 @@ public class StoreController {
         }
         model.addAttribute(keyProperties.getStyleFolder(),
                 folderProperties.getStyleFolder() + resourceProperties.getGamePageStyle());
+        model.addAttribute(keyProperties.getResourcesFolder(), folderProperties.getResourcesHtmlFolder());
         model.addAttribute(keyProperties.getUserHasGame(), userHasGame);
         model.addAttribute(keyProperties.getGame(), gameFromDatabase);
         model.addAttribute(keyProperties.getErrors(), errors);
@@ -75,6 +76,7 @@ public class StoreController {
         List<Game> games = gameRepository.findAllByGameCategory_Name(gameCategory).stream().collect(Collectors.toList());
         model.addAttribute(keyProperties.getStyleFolder(),
                 folderProperties.getStyleFolder() + resourceProperties.getGamesByCategoryPageStyle());
+        model.addAttribute(keyProperties.getResourcesFolder(), folderProperties.getResourcesHtmlFolder());
         model.addAttribute(keyProperties.getGames(), games);
         return "games_by_category";
     }

@@ -49,7 +49,7 @@
         <a th:href="'/store/games/' + ${game.getName()}" class="list-group-item list-group-item-action">
             <div class="d-flex w-100">
                 <img class="d-block"
-                     th:src="@{'file://I:/Idea/server folder/resources/' + ${game.getName()} + '/store_image/store_image.jpg'}"
+                     th:src="@{${resourcesFolder + game.getName()} + '/store_image/store_image.jpg'}"
                      alt="" width="100" height="70">
                 <div class="ml-3">
                     <h5 class="mb-1" th:text="${game.getTitle()}"></h5>

@@ -57,7 +57,7 @@
             <span>></span>
             <a th:text="${game.get().getTitle()}" th:href="'/store/games/' + ${game.get().getName()}"></a>
             <h3 th:text="${game.get().getTitle()}"></h3>
-            <img th:src="@{'file://I:/Idea/server folder/resources/' + ${game.get().getName()} + '/store_image/store_image.jpg'}"
+            <img th:src="@{${resourcesFolder + game.get().getName()} + '/store_image/store_image.jpg'}"
                  alt="D'oh">
         </div>
     </div>

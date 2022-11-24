@@ -29,6 +29,7 @@ public class ProfileController {
         Optional<User> user = userRepository.findByUsername(authentication.getName());
         model.addAttribute(keyProperties.getStyleFolder(),
                 folderProperties.getStyleFolder() + resourceProperties.getProfilePageStyle());
+        model.addAttribute(keyProperties.getResourcesFolder(), folderProperties.getResourcesHtmlFolder());
         model.addAttribute(keyProperties.getUser(), user);
         return "profile_page";
     }
