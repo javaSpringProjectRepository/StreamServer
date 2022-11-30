@@ -1,5 +1,7 @@
 package org.spring.project.application.server.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -26,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -93,7 +96,7 @@ public class GameService {
             response.setStatus(FORBIDDEN.value());
             response.setHeader(keyProperties.getServerMessage(),
                     utilService.sendServerErrorMessage("У пользователя " + user.getUsername() +
-                    " уже есть игра "));
+                            " уже есть игра "));
             return FORBIDDEN.value();
         }
         if (user.getBudget().compareTo(game.getPrice()) < 0) {
@@ -123,22 +126,22 @@ public class GameService {
             }}, NOT_FOUND);
         }
         List<GameLibraryDto> games = user.getGames().stream().map(game -> {
-            File gameDirectory = new File(
-                    folderProperties.getGamesFolder() +
-                            game.getName());
-            long size = 0;
-            if (gameDirectory.exists()) {
-                size = FileUtils.sizeOfDirectory(new File(
-                        folderProperties.getGamesFolder() +
-                                game.getName()));
-            }
-            return new GameLibraryDto(
-                    game.getName(),
-                    game.getTitle(),
-                    game.getGameStartFileName(),
-                    size,
-                    game.getGameUpdateNews());
-        })
+                    File gameDirectory = new File(
+                            folderProperties.getGamesFolder() +
+                                    game.getName());
+                    long size = 0;
+                    if (gameDirectory.exists()) {
+                        size = FileUtils.sizeOfDirectory(new File(
+                                folderProperties.getGamesFolder() +
+                                        game.getName()));
+                    }
+                    return new GameLibraryDto(
+                            game.getName(),
+                            game.getTitle(),
+                            game.getGameStartFileName(),
+                            size,
+                            game.getGameUpdateNews());
+                })
                 .collect(Collectors.toList());
         return new ResponseEntity<>(games, OK);
     }

@@ -64,8 +64,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 response.setStatus(NOT_ACCEPTABLE.value());
                 response.setHeader(keyProperties.getServerMessage(),
                         utilService.sendServerErrorMessage("Время действия токена истекло"));
-
-
             } catch (Exception e) {
                 log.error("Ошибка в 'CustomAuthorizationFilter'");
                 response.setStatus(FORBIDDEN.value());

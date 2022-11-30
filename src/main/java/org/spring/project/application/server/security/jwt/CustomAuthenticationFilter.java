@@ -2,7 +2,9 @@ package org.spring.project.application.server.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.spring.project.application.server.properties.KeyProperties;
 import org.spring.project.application.server.service.TokenService;
 import org.spring.project.application.server.service.UtilService;
@@ -58,11 +60,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                                               HttpServletResponse response,
                                               AuthenticationException failed) {
         response.setStatus(NOT_FOUND.value());
-        response.setHeader(keyProperties.getServerMessage(), utilService.sendServerErrorMessage("Пользователь не найден"));
+        response.setHeader(keyProperties.getServerMessage(),
+                utilService.sendServerErrorMessage("Неверное имя пользователя или пароль"));
     }
 }
 
-@Data
+@Getter
+@Setter
 class AuthenticationDto {
     private String username;
     private String password;
